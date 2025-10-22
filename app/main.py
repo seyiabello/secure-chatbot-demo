@@ -109,3 +109,15 @@ async def health():
         "model": getattr(settings, "model_name", "mock"),
         "time": f"{datetime.now():%Y-%m-%d %H:%M:%S}"
     }
+
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+
+# Serve static files
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+@app.get("/", response_class=HTMLResponse)
+async def home():
+    """Serve the simple chat UI."""
+    with open("app/static/index.html", "r", encoding="utf-8") as f:
+        return f.read()
