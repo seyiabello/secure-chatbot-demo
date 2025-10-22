@@ -98,3 +98,14 @@ async def chat(req: ChatRequest):
         log_event("API_EXCEPTION", str(e))
         print(f"[DEBUG] API Exception: {e}")
         raise HTTPException(status_code=500, detail=f"Unexpected server error: {e}")
+
+from datetime import datetime
+
+@app.get("/health")
+async def health():
+    """Simple health check endpoint"""
+    return {
+        "status": "ok",
+        "model": getattr(settings, "model_name", "mock"),
+        "time": f"{datetime.now():%Y-%m-%d %H:%M:%S}"
+    }

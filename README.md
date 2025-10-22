@@ -1,19 +1,33 @@
 # Secure Chatbot PoC (AI Security Mini-Project)
 
-A tiny FastAPI chatbot that **demonstrates prompt-injection attacks** and **defenses** with input/output guardrails and a minimal **security audit log**.
+A FastAPI microservice that demonstrates prompt-injection defenses, output sanitization, logging, and resilience (retry/fallback/mock).
 
-## What this shows
-- Input guard to flag likely prompt-injection attempts
-- Output guard to redact sensitive strings (e.g., “system prompt”, key-like blobs)
-- Simple security logging to `security.log`
-- Unit tests verifying guards
+## Features
+- Guarded `/chat` endpoint
+- Output redaction + input blocking
+- Security logging to `security.log`
+- `/health` endpoint for uptime
+- Works offline in mock mode
+- Dockerized + pytest coverage
 
-## Stack
-FastAPI · Python · Pytest · (optional) OpenAI API · Docker (optional)
-
-## Quickstart (local)
+## Quickstart
 ```bash
 python -m venv .venv
-source .venv/Scripts/activate           # (Git Bash on Windows)
+source .venv/Scripts/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
+...
+EOF
+
+yaml
+Copy code
+
+---
+
+## 🔒 Step 5 — Create `THREAT_MODEL.md`
+
+```bash
+cat > THREAT_MODEL.md << 'EOF'
+# Threat Model — Secure Chatbot PoC
+...
+EOF
