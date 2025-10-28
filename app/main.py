@@ -120,30 +120,51 @@ async def chat(req: ChatRequest):
 
 
 # ---------- Health & Root (GET + HEAD) ----------
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import Response
+from pathlib import Path
+
+STATIC_DIR = Path("app/static")
+INDEX_HTML = STATIC_DIR / "index.html"
+
+# Health (GET + HEAD)
 @app.get("/health")
 async def health():
-    """Simple health check endpoint — always returns 200 and never calls external APIs."""
     return {
         "status": "ok",
         "primary_model": getattr(settings, "model_name", "mock"),
         "time": f"{datetime.now():%Y-%m-%d %H:%M:%S}",
     }
 
-
 @app.head("/health")
 async def health_head():
     return Response(status_code=200)
 
+# Serve /static if the directory exists (safe to call even if missing)
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
-@app.get("/")
-async def root_json():
-    """JSON root (for programmatic checks)"""
-    return {"message": "Secure Chatbot is running. See /docs, /health, and / for UI."}
+# Root (GET): prefer the HTML UI if present; otherwise return a tiny HTML page
+@app.get("/", response_class=HTMLResponse)
+async def root_ui():
+    if INDEX_HTML.exists():
+        with open(INDEX_HTML, "r", encoding="utf-8") as f:
+            return f.read()
+    # HTML fallback (not JSON)
+    return """<!doctype html>
+<html lang="en"><meta charset="utf-8">
+<title>Secure Chatbot</title>
+<body style="font-family:system-ui; max-width:720px; margin:3rem auto;">
+  <h1>Secure Chatbot is running 🟢</h1>
+  <p>Use the <a href="/docs">Swagger UI</a> or <a href="/health">/health</a>.</p>
+  <p>If you expected a full web UI, make sure <code>app/static/index.html</code> exists and is committed.</p>
+</body></html>"""
 
-
+# Root (HEAD): return 200 for uptime checkers
 @app.head("/")
 async def root_head():
     return Response(status_code=200)
+
 
 
 # ---------- Static UI (optional) ----------
