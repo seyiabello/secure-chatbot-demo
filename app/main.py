@@ -1,10 +1,20 @@
-from fastapi import FastAPI, HTTPException
+# app/main.py
+from __future__ import annotations
+
+import os
+from pathlib import Path
+from datetime import datetime
+
+from fastapi import FastAPI, HTTPException, Response
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential
+
 from .settings import settings
 from .guardrails import apply_input_guard, apply_output_guard
-from datetime import datetime
+
 
 app = FastAPI()
 
@@ -20,7 +30,7 @@ def log_event(event_type: str, message: str):
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=2, max=10),
-    reraise=True
+    reraise=True,
 )
 async def call_openai(prompt: str, api_key: str, model: str):
     """Call OpenAI API with retry logic for transient failures."""
@@ -29,18 +39,20 @@ async def call_openai(prompt: str, api_key: str, model: str):
             "https://api.openai.com/v1/chat/completions",
             headers={
                 "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             },
             json={
                 "model": model,
-                "messages": [{"role": "user", "content": prompt}]
+                "messages": [{"role": "user", "content": prompt}],
             },
-            timeout=30.0
+            timeout=30.0,
         )
 
+        # Retry on transient codes
         if resp.status_code in (429, 500, 502, 503):
             raise Exception(f"Transient API error: {resp.status_code}")
 
+        # Surface non-OK errors
         if resp.status_code != 200:
             log_event("API_ERROR", resp.text)
             raise HTTPException(status_code=resp.status_code, detail="LLM API error")
@@ -57,67 +69,93 @@ class ChatRequest(BaseModel):
 @app.post("/chat")
 async def chat(req: ChatRequest):
     try:
-        # 1️⃣ Input Guard
+        # 1) Input Guard
         if apply_input_guard(req.message):
             log_event("BLOCKED_INPUT", req.message)
             return {"response": "I'm sorry — I cannot comply with that request."}
 
-        # 2️⃣ Try primary model
-        primary_model = settings.model_name or "gpt-4o-mini"
+        # 2) Missing API key? Use mock mode immediately
+        api_key = getattr(settings, "openai_api_key", "") or os.getenv("OPENAI_API_KEY", "")
+        if not api_key:
+            log_event("MOCK_MODE", "OPENAI_API_KEY not set — serving mock response.")
+            mock_response = f"[MOCK RESPONSE] Hi! I’m your local AI assistant (offline mode). You said: '{req.message}'"
+            clean_text = apply_output_guard(mock_response)
+            return {"response": clean_text}
+
+        # 3) Try primary model
+        primary_model = getattr(settings, "model_name", "") or os.getenv("MODEL_NAME", "") or "gpt-4o-mini"
         try:
-            j = await call_openai(req.message, settings.openai_api_key, primary_model)
+            j = await call_openai(req.message, api_key, primary_model)
         except Exception as e:
-            # 3️⃣ Try fallback model
-            if "429" in str(e) or "503" in str(e):
+            # 4) Try fallback model on typical transient errors
+            if any(code in str(e) for code in ("429", "503", "502", "500")):
                 fallback_model = "gpt-3.5-turbo"
-                log_event(
-                    "FALLBACK_TRIGGERED",
-                    f"Switching from {primary_model} -> {fallback_model} due to {e}"
-                )
+                log_event("FALLBACK_TRIGGERED", f"Switching {primary_model} -> {fallback_model} due to: {e}")
                 try:
-                    j = await call_openai(req.message, settings.openai_api_key, fallback_model)
+                    j = await call_openai(req.message, api_key, fallback_model)
                 except Exception as inner_e:
-                    # 4️⃣ Enter mock LLM mode
-                    log_event("MOCK_MODE", f"Using local mock response due to {inner_e}")
+                    # 5) Enter mock LLM mode
+                    log_event("MOCK_MODE", f"Using local mock response due to fallback failure: {inner_e}")
                     mock_response = f"[MOCK RESPONSE] Hi! I’m your local AI assistant (offline mode). You said: '{req.message}'"
                     clean_text = apply_output_guard(mock_response)
                     return {"response": clean_text}
             else:
                 raise e
 
-        # 5️⃣ Extract and sanitize response
-        text = j.get("choices", [{}])[0].get("message", {}).get("content", "")
+        # 6) Extract and sanitize response
+        text = j.get("choices", [{}])[0].get("message", {}).get("content", "") or ""
         clean_text = apply_output_guard(text)
-
         if clean_text != text:
             log_event("REDACTED_OUTPUT", text)
 
         return {"response": clean_text}
 
+    except HTTPException:
+        # Already logged above for API_ERROR
+        raise
     except Exception as e:
         log_event("API_EXCEPTION", str(e))
-        print(f"[DEBUG] API Exception: {e}")
-        raise HTTPException(status_code=500, detail=f"Unexpected server error: {e}")
+        # Avoid non-ASCII in detail to prevent codec issues on some terminals
+        raise HTTPException(status_code=500, detail=f"Unexpected server error: {str(e)}")
 
-from datetime import datetime
 
+# ---------- Health & Root (GET + HEAD) ----------
 @app.get("/health")
 async def health():
-    """Simple health check endpoint"""
+    """Simple health check endpoint — always returns 200 and never calls external APIs."""
     return {
         "status": "ok",
-        "model": getattr(settings, "model_name", "mock"),
-        "time": f"{datetime.now():%Y-%m-%d %H:%M:%S}"
+        "primary_model": getattr(settings, "model_name", "mock"),
+        "time": f"{datetime.now():%Y-%m-%d %H:%M:%S}",
     }
 
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
 
-# Serve static files
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+@app.head("/health")
+async def health_head():
+    return Response(status_code=200)
 
-@app.get("/", response_class=HTMLResponse)
-async def home():
-    """Serve the simple chat UI."""
-    with open("app/static/index.html", "r", encoding="utf-8") as f:
-        return f.read()
+
+@app.get("/")
+async def root_json():
+    """JSON root (for programmatic checks)"""
+    return {"message": "Secure Chatbot is running. See /docs, /health, and / for UI."}
+
+
+@app.head("/")
+async def root_head():
+    return Response(status_code=200)
+
+
+# ---------- Static UI (optional) ----------
+# Serve / (HTML UI) if app/static/index.html exists; else keep JSON root above.
+STATIC_DIR = Path("app/static")
+INDEX_HTML = STATIC_DIR / "index.html"
+
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+    if INDEX_HTML.exists():
+        @app.get("/", response_class=HTMLResponse)
+        async def home():
+            with open(INDEX_HTML, "r", encoding="utf-8") as f:
+                return f.read()
