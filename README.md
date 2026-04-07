@@ -101,45 +101,46 @@ Security Log (metadata only)
 git clone https://github.com/seyiabello/secure-chatbot-demo.git
 cd secure-chatbot-demo
 ```
-2️⃣ Create virtual environment
+## 2️⃣ Create virtual environment
 python -m venv .venv
 source .venv/Scripts/activate   # Windows (Git Bash)
 # or
 source .venv/bin/activate       # macOS/Linux
-3️⃣ Install dependencies
+## 3️⃣ Install dependencies
 pip install -r requirements.txt
-4️⃣ Configure environment variables
+
+## 4️⃣ Configure environment variables
 
 Create a .env file:
 
 OPENAI_API_KEY=sk-xxxx
 MODEL_NAME=gpt-3.5-turbo
-5️⃣ Run the app
+## 5️⃣ Run the app
 uvicorn app.main:app --reload --port 8000
 Access:
 Chat UI → http://127.0.0.1:8000
 Docs → http://127.0.0.1:8000/docs
 Health → http://127.0.0.1:8000/health
-🧪 Tests
+## 🧪 Tests
 
 Run all tests:
 
 pytest -q
-🐳 Docker Usage
+## 🐳 Docker Usage
 Build image
 docker build -t secure-chatbot-demo .
 Run (mock mode)
 docker run -p 8000:8000 secure-chatbot-demo
 Run (with API key)
 docker run -e OPENAI_API_KEY="sk-xxx" -e MODEL_NAME="gpt-3.5-turbo" -p 8000:8000 secure-chatbot-demo
-🌐 Deployment (Render)
+## 🌐 Deployment (Render)
 
 The app is deployed using Docker on Render.
 
 Environment variables:
 OPENAI_API_KEY (optional for mock mode)
 MODEL_NAME (e.g. gpt-3.5-turbo)
-🔍 Security Practices
+## 🔍 Security Practices
 .env excluded via .gitignore
 Secrets injected via environment variables only
 Logs store metadata only (no user content)
@@ -150,7 +151,7 @@ Guardrails enforce safe interaction
 Rate limiting (SlowAPI)
 Authentication (JWT / API key)
 PII detection layer
-🧱 Project Structure
+## 🧱 Project Structure
 secure-chatbot-demo/
 ├── app/
 │   ├── main.py
@@ -163,7 +164,7 @@ secure-chatbot-demo/
 ├── Dockerfile
 ├── THREAT_MODEL.md
 └── README.md
-🧠 Threat Model (Summary)
+## 🧠 Threat Model (Summary)
 Covered threats:
 Prompt injection / jailbreak attempts
 Sensitive data leakage
@@ -178,7 +179,7 @@ Environment-based secret management
 
 👉 See THREAT_MODEL.md for full details
 
-🧰 Tech Stack
+## 🧰 Tech Stack
 Component	Technology
 Backend	FastAPI (Python 3.11)
 LLM	OpenAI API / Mock
@@ -186,13 +187,13 @@ Deployment	Render (Docker)
 Testing	Pytest
 Logging	Local UTF-8 file
 Frontend	HTML + Fetch API
-💡 Future Enhancements
+## 💡 Future Enhancements
 Authentication (JWT / API keys)
 Rate limiting (SlowAPI)
 ML-based input classification
 Observability dashboards
 Extended LLM fallback logic
-👤 Author
+## 👤 Author
 
 Oluwaseyi Bello
 🎓 MSc Human-Centred AI (Data Science) — University of Exeter
@@ -202,7 +203,7 @@ Oluwaseyi Bello
 
 🔗 https://www.linkedin.com/in/oluwaseyi-bello-2653a2215/
 
-🪪 License
+## 🪪 License
 
 Educational and research use.
 Feel free to fork and extend with credit.
