@@ -100,6 +100,7 @@ Security Log (metadata only)
 ```bash
 git clone https://github.com/seyiabello/secure-chatbot-demo.git
 cd secure-chatbot-demo
+```
 2️⃣ Create virtual environment
 python -m venv .venv
 source .venv/Scripts/activate   # Windows (Git Bash)
