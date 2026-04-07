@@ -101,38 +101,68 @@ Security Log (metadata only)
 git clone https://github.com/seyiabello/secure-chatbot-demo.git
 cd secure-chatbot-demo
 ```
+
 ## 2️⃣ Create virtual environment
+
+```bash
 python -m venv .venv
 source .venv/Scripts/activate   # Windows (Git Bash)
 # or
 source .venv/bin/activate       # macOS/Linux
+```
+
 ## 3️⃣ Install dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
 ## 4️⃣ Configure environment variables
 
+```bash
 Create a .env file:
 
 OPENAI_API_KEY=sk-xxxx
 MODEL_NAME=gpt-3.5-turbo
+```
+
 ## 5️⃣ Run the app
+
+```bash
 uvicorn app.main:app --reload --port 8000
+```
+
 Access:
 Chat UI → http://127.0.0.1:8000
 Docs → http://127.0.0.1:8000/docs
 Health → http://127.0.0.1:8000/health
+
 ## 🧪 Tests
 
 Run all tests:
 
+```bash
 pytest -q
+```
+
 ## 🐳 Docker Usage
+
 Build image
+
+```bash
 docker build -t secure-chatbot-demo .
+```
+
 Run (mock mode)
+```bash
 docker run -p 8000:8000 secure-chatbot-demo
+```
+
 Run (with API key)
+```bash
 docker run -e OPENAI_API_KEY="sk-xxx" -e MODEL_NAME="gpt-3.5-turbo" -p 8000:8000 secure-chatbot-demo
+```
+
 ## 🌐 Deployment (Render)
 
 The app is deployed using Docker on Render.
@@ -140,7 +170,9 @@ The app is deployed using Docker on Render.
 Environment variables:
 OPENAI_API_KEY (optional for mock mode)
 MODEL_NAME (e.g. gpt-3.5-turbo)
+
 ## 🔍 Security Practices
+
 .env excluded via .gitignore
 Secrets injected via environment variables only
 Logs store metadata only (no user content)
@@ -151,7 +183,10 @@ Guardrails enforce safe interaction
 Rate limiting (SlowAPI)
 Authentication (JWT / API key)
 PII detection layer
+
 ## 🧱 Project Structure
+
+```bash
 secure-chatbot-demo/
 ├── app/
 │   ├── main.py
@@ -164,6 +199,8 @@ secure-chatbot-demo/
 ├── Dockerfile
 ├── THREAT_MODEL.md
 └── README.md
+```
+
 ## 🧠 Threat Model (Summary)
 Covered threats:
 Prompt injection / jailbreak attempts
