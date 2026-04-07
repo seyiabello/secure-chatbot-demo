@@ -219,19 +219,23 @@ Controls implemented:
 👉 See THREAT_MODEL.md for full details
 
 ## 🧰 Tech Stack
-Component	Technology
-Backend	FastAPI (Python 3.11)
-LLM	OpenAI API / Mock
-Deployment	Render (Docker)
-Testing	Pytest
-Logging	Local UTF-8 file
-Frontend	HTML + Fetch API
+
+| Component  | Technology              |
+|-----------|------------------------|
+| Backend   | FastAPI (Python 3.11)  |
+| LLM       | OpenAI API / Mock      |
+| Deployment| Render (Docker)        |
+| Testing   | Pytest                 |
+| Logging   | Local UTF-8 file       |
+| Frontend  | HTML + Fetch API       |
+
 ## 💡 Future Enhancements
-Authentication (JWT / API keys)
-Rate limiting (SlowAPI)
-ML-based input classification
-Observability dashboards
-Extended LLM fallback logic
+- Authentication (JWT / API keys)
+- Rate limiting (SlowAPI)
+- ML-based input classification
+- Observability dashboards
+- Extended LLM fallback logic
+
 ## 👤 Author
 
 Oluwaseyi Bello
