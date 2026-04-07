@@ -132,7 +132,7 @@ MODEL_NAME=gpt-3.5-turbo
 uvicorn app.main:app --reload --port 8000
 ```
 
-Access:
+### Access:
 Chat UI → http://127.0.0.1:8000
 Docs → http://127.0.0.1:8000/docs
 Health → http://127.0.0.1:8000/health
@@ -147,18 +147,18 @@ pytest -q
 
 ## 🐳 Docker Usage
 
-Build image
+### Build image
 
 ```bash
 docker build -t secure-chatbot-demo .
 ```
 
-Run (mock mode)
+### Run (mock mode)
 ```bash
 docker run -p 8000:8000 secure-chatbot-demo
 ```
 
-Run (with API key)
+### Run (with API key)
 ```bash
 docker run -e OPENAI_API_KEY="sk-xxx" -e MODEL_NAME="gpt-3.5-turbo" -p 8000:8000 secure-chatbot-demo
 ```
@@ -167,7 +167,7 @@ docker run -e OPENAI_API_KEY="sk-xxx" -e MODEL_NAME="gpt-3.5-turbo" -p 8000:8000
 
 The app is deployed using Docker on Render.
 
-Environment variables:
+### Environment variables:
 - OPENAI_API_KEY (optional for mock mode)
 - MODEL_NAME (e.g. gpt-3.5-turbo)
 
@@ -202,14 +202,14 @@ secure-chatbot-demo/
 ```
 
 ## 🧠 Threat Model (Summary)
-Covered threats:
+### Covered threats:
 - Prompt injection / jailbreak attempts
 - Sensitive data leakage
 - API key exposure
 - Logging vulnerabilities
 - DoS / quota exhaustion
 
-Controls implemented:
+### Controls implemented:
 
 - Input/output guards
 - Logging redaction
@@ -250,3 +250,8 @@ Oluwaseyi Bello
 
 Educational and research use.
 Feel free to fork and extend with credit.
+
+## Summary
+
+A secure, testable, and deployable AI backend demonstrating how to build
+trustworthy LLM systems with guardrails, resilience, and real-world constraints.
