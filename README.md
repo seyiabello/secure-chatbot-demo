@@ -55,6 +55,7 @@ Security Log (metadata only)
 
 
 ### 🔐 Design Principles
+
 - Never trust user input  
 - Never expose raw model output  
 - Never log sensitive data  
@@ -95,6 +96,7 @@ Security Log (metadata only)
 # ⚙️ Local Setup
 
 ## 1️⃣ Clone the repo
+
 ```bash
 git clone https://github.com/seyiabello/secure-chatbot-demo.git
 cd secure-chatbot-demo
@@ -161,9 +163,7 @@ secure-chatbot-demo/
 ├── THREAT_MODEL.md
 └── README.md
 🧠 Threat Model (Summary)
-
 Covered threats:
-
 Prompt injection / jailbreak attempts
 Sensitive data leakage
 API key exposure
