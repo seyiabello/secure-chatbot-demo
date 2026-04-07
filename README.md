@@ -203,16 +203,18 @@ secure-chatbot-demo/
 
 ## 🧠 Threat Model (Summary)
 Covered threats:
-Prompt injection / jailbreak attempts
-Sensitive data leakage
-API key exposure
-Logging vulnerabilities
-DoS / quota exhaustion
+- Prompt injection / jailbreak attempts
+- Sensitive data leakage
+- API key exposure
+- Logging vulnerabilities
+- DoS / quota exhaustion
+
 Controls implemented:
-Input/output guards
-Logging redaction
-Retry + fallback + mock modes
-Environment-based secret management
+
+- Input/output guards
+- Logging redaction
+- Retry + fallback + mock modes
+- Environment-based secret management
 
 👉 See THREAT_MODEL.md for full details
 
