@@ -1,193 +1,207 @@
-# 🛡️ Secure Chatbot PoC (AI Security Mini-Project)
+<!-- ======================= -->
+<!-- 🔥 HERO SECTION -->
+<!-- ======================= -->
 
-A lightweight **FastAPI-based chatbot service** that demonstrates **prompt-injection defenses**, **output sanitization**, **security logging**, and **resilience mechanisms** such as retries, model fallback, and mock local responses.
+<h1 align="center">🛡️ Secure AI Chatbot (PoC)</h1>
 
-🌐 **Live Demo:** [https://secure-chatbot-demo.onrender.com](https://secure-chatbot-demo.onrender.com)  
-📘 **API Docs:** [https://secure-chatbot-demo.onrender.com/docs](https://secure-chatbot-demo.onrender.com/docs)
+<p align="center">
+  <b>Secure LLM Backend · FastAPI · Guardrails · Resilience Engineering</b>
+</p>
+
+<p align="center">
+  A production-style AI chatbot demonstrating prompt injection defense, output sanitisation, and secure deployment patterns
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/AI-Security-blue?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/FastAPI-Backend-green?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Docker-Deployable-blue?style=for-the-badge"/>
+</p>
+
+<p align="center">
+  🌐 <a href="https://secure-chatbot-demo.onrender.com"><b>Live Demo</b></a> ·
+  📘 <a href="https://secure-chatbot-demo.onrender.com/docs"><b>API Docs</b></a>
+</p>
 
 ---
 
-## 🚀 Features
+# 🧠 Overview
 
-✅ **Prompt Injection Defense** – input filtering for unsafe patterns  
-✅ **Output Guardrails** – redacts sensitive or forbidden text  
-✅ **Secure Logging** – UTF-8 safe `security.log` events only (no secrets)  
-✅ **Resilience** – automatic retries, fallback models, mock mode when API unavailable  
-✅ **Dockerized** – portable and production-ready container  
-✅ **/health Endpoint** – uptime and model info for monitoring  
-✅ **Pytest Suite** – automated tests for guards and mock mode  
-✅ **Web UI** – minimal HTML chat interface for quick demos  
+This project is a **secure AI chatbot backend** built with FastAPI, designed to demonstrate:
+
+- Prompt injection defence  
+- Output sanitisation (guardrails)  
+- Secure logging practices  
+- Resilient LLM interaction (fallback + retries + mock mode)  
+
+👉 Focus: **building safe, deployable AI systems — not just models**
 
 ---
 
-## 🧠 Architecture Overview
+# 🧠 System Architecture
+
 
 User → /chat (FastAPI)
 ↓
-Input Guard → LLM (OpenAI API or Mock)
+Input Guard (Prompt Injection Filtering)
 ↓
-Output Guard → Response
+LLM (OpenAI API or Mock Mode)
 ↓
-Security Log (security.log)
+Output Guard (Sanitisation / Redaction)
+↓
+Response to User
+↓
+Security Log (metadata only)
 
-yaml
-Copy code
 
-- Input & output guards protect against **prompt injection** and **data leakage**
-- Uses `.env` for secret management (`OPENAI_API_KEY`, `MODEL_NAME`)
-- Logs only event metadata — not sensitive content
+### 🔐 Design Principles
+- Never trust user input  
+- Never expose raw model output  
+- Never log sensitive data  
+- Always support graceful failure  
 
 ---
 
-## ⚙️ Setup & Local Run
+# 🚀 Features
 
-### 1️⃣ Clone & enter the project
+### 🛡️ Security
+- Prompt injection detection and filtering  
+- Output guardrails (sensitive data redaction)  
+- UTF-8 safe logging (`security.log`)  
+- No secrets stored or logged  
+
+### ⚙️ Resilience
+- Automatic retries on failure  
+- Model fallback support  
+- Mock mode (works without API key)  
+
+### 🧪 Testing
+- Pytest suite for:
+  - Guardrails  
+  - Mock mode  
+  - Core functionality  
+
+### 🌐 API & UI
+- FastAPI backend (`/chat`, `/health`)  
+- Interactive Swagger docs (`/docs`)  
+- Minimal HTML chat interface  
+
+### 🐳 Deployment
+- Dockerised for portability  
+- Deployed on Render  
+
+---
+
+# ⚙️ Local Setup
+
+## 1️⃣ Clone the repo
 ```bash
 git clone https://github.com/seyiabello/secure-chatbot-demo.git
 cd secure-chatbot-demo
-2️⃣ Create & activate virtual environment
-bash
-Copy code
+2️⃣ Create virtual environment
 python -m venv .venv
-source .venv/Scripts/activate   # On Windows (Git Bash)
+source .venv/Scripts/activate   # Windows (Git Bash)
 # or
-source .venv/bin/activate       # On macOS/Linux
+source .venv/bin/activate       # macOS/Linux
 3️⃣ Install dependencies
-bash
-Copy code
 pip install -r requirements.txt
-4️⃣ Add environment variables
-Create a .env file (not committed):
+4️⃣ Configure environment variables
 
-ini
-Copy code
+Create a .env file:
+
 OPENAI_API_KEY=sk-xxxx
 MODEL_NAME=gpt-3.5-turbo
 5️⃣ Run the app
-bash
-Copy code
 uvicorn app.main:app --reload --port 8000
-Visit:
-
+Access:
 Chat UI → http://127.0.0.1:8000
-
 Docs → http://127.0.0.1:8000/docs
-
-Health check → http://127.0.0.1:8000/health
-
+Health → http://127.0.0.1:8000/health
 🧪 Tests
+
 Run all tests:
 
-bash
-Copy code
 pytest -q
 🐳 Docker Usage
-Build the image
-bash
-Copy code
+Build image
 docker build -t secure-chatbot-demo .
-Run the container
-Mock mode (no API key):
-
-bash
-Copy code
+Run (mock mode)
 docker run -p 8000:8000 secure-chatbot-demo
-Live LLM mode:
-
-bash
-Copy code
+Run (with API key)
 docker run -e OPENAI_API_KEY="sk-xxx" -e MODEL_NAME="gpt-3.5-turbo" -p 8000:8000 secure-chatbot-demo
 🌐 Deployment (Render)
-The service is automatically deployed on Render using the Dockerfile.
 
-Environment Variables on Render
-OPENAI_API_KEY → your API key (optional for mock mode)
+The app is deployed using Docker on Render.
 
-MODEL_NAME → e.g., gpt-3.5-turbo
-
+Environment variables:
+OPENAI_API_KEY (optional for mock mode)
+MODEL_NAME (e.g. gpt-3.5-turbo)
 🔍 Security Practices
-.env excluded from Git via .gitignore
-
+.env excluded via .gitignore
 Secrets injected via environment variables only
+Logs store metadata only (no user content)
+Guardrails enforce safe interaction
 
-Logs only events, not content
+👉 Production-ready extensions:
 
-Rate limits, auth, or PII scanning can be added for production
-
+Rate limiting (SlowAPI)
+Authentication (JWT / API key)
+PII detection layer
 🧱 Project Structure
-bash
-Copy code
 secure-chatbot-demo/
 ├── app/
-│   ├── main.py           # FastAPI app (core routes + guards)
-│   ├── guardrails.py     # Input/output sanitization rules
-│   ├── settings.py       # Env variable loading (pydantic)
-│   ├── prompts.py        # (Optional) prompt templates
+│   ├── main.py
+│   ├── guardrails.py
+│   ├── settings.py
+│   ├── prompts.py
 │   └── tests/
-│       ├── test_security.py
-│       └── test_mock_mode.py
-├── security.log          # Security event log
+├── security.log
 ├── requirements.txt
-├── README.md
 ├── Dockerfile
-└── THREAT_MODEL.md
-🧠 Threat Model Summary
-See THREAT_MODEL.md for full analysis.
+├── THREAT_MODEL.md
+└── README.md
+🧠 Threat Model (Summary)
 
-Threats covered:
+Covered threats:
 
 Prompt injection / jailbreak attempts
-
 Sensitive data leakage
-
-Logging & API key exposure
-
-DoS or quota exhaustion
-
+API key exposure
+Logging vulnerabilities
+DoS / quota exhaustion
 Controls implemented:
-
-Input & output guards
-
+Input/output guards
 Logging redaction
-
 Retry + fallback + mock modes
-
 Environment-based secret management
+
+👉 See THREAT_MODEL.md for full details
 
 🧰 Tech Stack
 Component	Technology
 Backend	FastAPI (Python 3.11)
-LLM Interface	OpenAI API / Mock
+LLM	OpenAI API / Mock
 Deployment	Render (Docker)
-Tests	Pytest
-Logging	Local UTF-8 log file
-Frontend	Minimal HTML + Fetch API
-
-🧾 Status & Badges
-
-
-
-
-
+Testing	Pytest
+Logging	Local UTF-8 file
+Frontend	HTML + Fetch API
 💡 Future Enhancements
-Add authentication (API key or JWT)
-
-Integrate rate limiting (SlowAPI)
-
-Add advanced ML-based input classifiers
-
-Expand test coverage (LLM mock & fallback)
-
-Add small web dashboard for logs
-
+Authentication (JWT / API keys)
+Rate limiting (SlowAPI)
+ML-based input classification
+Observability dashboards
+Extended LLM fallback logic
 👤 Author
+
 Oluwaseyi Bello
-📧 seyiabello@gmail.com https://www.linkedin.com/in/oluwaseyi-bello-2653a2215/
-🎓 MSc Human-Centred AI with proficiency in Data Science, University of Exeter
-💻 Passionate about secure AI systems and trustworthy LLM development.
+🎓 MSc Human-Centred AI (Data Science) — University of Exeter
+💻 AI Engineer focused on secure, deployable AI systems
+
+📧 seyiabello@gmail.com
+
+🔗 https://www.linkedin.com/in/oluwaseyi-bello-2653a2215/
 
 🪪 License
-This project is provided for educational and research use.
-Feel free to fork and extend with credit.
 
-✨ Secure, testable, and deployable AI guardrail demo — built for learning and trustworthiness in LLM applications.
+Educational and research use.
+Feel free to fork and extend with credit.
