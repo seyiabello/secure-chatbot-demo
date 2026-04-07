@@ -168,21 +168,21 @@ docker run -e OPENAI_API_KEY="sk-xxx" -e MODEL_NAME="gpt-3.5-turbo" -p 8000:8000
 The app is deployed using Docker on Render.
 
 Environment variables:
-OPENAI_API_KEY (optional for mock mode)
-MODEL_NAME (e.g. gpt-3.5-turbo)
+- OPENAI_API_KEY (optional for mock mode)
+- MODEL_NAME (e.g. gpt-3.5-turbo)
 
 ## 🔍 Security Practices
 
-.env excluded via .gitignore
-Secrets injected via environment variables only
-Logs store metadata only (no user content)
-Guardrails enforce safe interaction
+- .env excluded via .gitignore
+- Secrets injected via environment variables only
+- Logs store metadata only (no user content)
+- Guardrails enforce safe interaction
 
 👉 Production-ready extensions:
 
-Rate limiting (SlowAPI)
-Authentication (JWT / API key)
-PII detection layer
+- Rate limiting (SlowAPI)
+- Authentication (JWT / API key)
+- PII detection layer
 
 ## 🧱 Project Structure
 
