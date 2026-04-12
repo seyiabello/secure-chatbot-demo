@@ -40,18 +40,11 @@ This project is a **secure AI chatbot backend** built with FastAPI, designed to 
 
 # 🧠 System Architecture
 
+<p align="center">
+  <img src="./secure%20llm%20chatbot%20system.PNG" width="100%"/>
+</p>
 
-User → /chat (FastAPI)
-↓
-Input Guard (Prompt Injection Filtering)
-↓
-LLM (OpenAI API or Mock Mode)
-↓
-Output Guard (Sanitisation / Redaction)
-↓
-Response to User
-↓
-Security Log (metadata only)
+<p align="center"><i>Secure LLM chatbot architecture with guardrails, resilience, and logging</i></p>
 
 
 ### 🔐 Design Principles
